@@ -1,0 +1,125 @@
+<html>
+<head>
+    <title>
+    
+     weather api    
+    </title>
+    
+<script src="jquery-2.2.4.min.js"></script>
+<link href="bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="jquery-ui-1.11.4.custom/jquery-ui.min.css" rel="stylesheet">
+<script src="jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+</head>
+    <style>
+    
+        .image {
+            width:60px;
+            height: 60px;
+        }
+        
+        .fontall {
+            font-family: monospace;
+            color: whitesmoke;
+            font-size: 40px;
+        }
+    
+        .body {
+            background-color: #161616;
+        }
+    
+    
+        .jumbotron {
+            border-radius: 20px;
+            font-size: 150px;
+            background-color: #161616;
+            color: white;
+            
+        }
+        
+        
+        
+    </style>
+<body class="body">
+<div clas="container-fluid">
+    <h1 class="jumbotron" style="text-align:center;">WeatherApp</h1>
+        
+        <div id ="climate" class="fontall" style="text-align:center;">
+            <button class="btn btn-primary btn-lg" id="toggle">&deg;C/&deg;F</button>
+            
+            
+            <br>
+            <div id ="place">
+                <p ></p>
+            </div>
+            <div class="glyphicon glyphicon-info-sign" style="margin-left:290px;margin-top:-58px; font-size:15px;" title="This is your Current Location">     
+            </div>
+            <div id ="temp">
+            <p> </p>
+            </div>
+       
+            <div id="description">
+            <p title="Current Weather Condiditions"></p>
+            </div>
+                       
+            <div id="weather">
+            <p></p>
+            </div>
+            <div id="icon">
+            <p></p>
+            </div>
+      </div>
+            </div>
+      
+
+<script>
+var lat ='';
+var lon = '';
+var imagelink ='';
+//var value ='';
+
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(position){
+           lat = position.coords.latitude;
+           lon = position.coords.longitude;
+           $.getJSON("http://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid=2afa2f1816ccc05fc98673f620cabab7&units=imperial",function(json){
+               //get place and country
+              $("p","#place").html(JSON.stringify(json.name).replace(/\"/g,"") + "," +JSON.stringify(json.sys.country).replace(/\"/g,"")); 
+              $("p","#temp").html(JSON.stringify(json.main.temp) +"F");   //set temp
+              $("p","#weather").html("Humidity:"+JSON.stringify(json.main.humidity)+ "<small>%</small>");
+              $("p","#description").html(JSON.stringify(json.weather[0].description.toUpperCase()).replace(/\"/g,""));    
+               // get icon number from json and add it to the img tag using jquery
+            
+                var iconval = JSON.stringify(json.weather[0].icon).replace(/\"/g,"");
+                var imagelink ="http://openweathermap.org/img/w/"+iconval+".png";
+             $("p","#description").append("&nbsp;" +  "<img src ="+imagelink+">");
+                 
+               //functions to change C-> F & F->C
+            
+           function cel(){
+             
+             
+               var value =  (JSON.stringify(json.main.temp) -32) * 5/9;
+               return value.toFixed(2) + "&deg;C";
+              };
+               cel(JSON.stringify(json.main.temp));    
+           
+               
+            $(document).ready(function(){
+                
+            $("button").click(function(){
+                var fahval = JSON.stringify(json.main.temp);          
+                var text = $("p","#temp").text();
+                $("p","#temp").html(text == fahval +" F"  ? cel() :fahval +" F");
+                
+                });
+            });
+        });        
+    });
+        
+};
+    
+    
+    
+    </script>
+    </body>
+    </html>
